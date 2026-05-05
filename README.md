@@ -47,9 +47,30 @@ Planned target:
 - WPF
 - Windows
 
-## Project Status
+## 🚧 Project Status
 
-This project is in early development.
+This project is currently in active development, but the core functionality is already implemented and usable.
+
+### ✅ Completed
+
+- FTP browsing support
+- SFTP browsing support (password and private key)
+- Folder selection dialog (fully functional)
+- Connection monitoring with auto status updates
+- Reconnect handling
+- TreeView navigation with path synchronization
+- Sample application for testing
+
+### ⏳ In Progress
+
+- File selection dialog (multi-select)
+- UI/UX enhancements (icons, loading indicators, polish)
+
+### 🔜 Planned
+
+- NuGet package release
+- Documentation improvements
+- Advanced filtering and sorting
 
 ## License
 
