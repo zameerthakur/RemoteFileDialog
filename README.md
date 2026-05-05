@@ -54,3 +54,10 @@ This project is in early development.
 ## License
 
 This project is licensed under the MIT License.
+
+## Third-Party Libraries
+
+This project uses the following open-source libraries:
+
+- FluentFTP (MIT License)
+- SSH.NET (MIT License)
