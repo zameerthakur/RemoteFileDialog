@@ -1,24 +1,42 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
+using RemoteFileDialog.Core.Enums;
+using RemoteFileDialog.Core.Models;
+using RemoteFileDialog.Wpf.Dialogs;
+using RemoteFileDialog.Wpf.Options;
 
-namespace RemoteFileDialog.SampleApp
+namespace RemoteFileDialog.SampleApp;
+
+/// <summary>
+/// Main application window.
+/// </summary>
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public MainWindow()
     {
-        public MainWindow()
+        InitializeComponent();
+    }
+
+    private void OpenDialog_Click(object sender, RoutedEventArgs e)
+    {
+        var connectionOptions = new RemoteConnectionOptions
         {
-            InitializeComponent();
+            ConnectionType = RemoteConnectionType.Ftp, // change to Sftp if needed
+            Host = "192.168.65.239",                  // public test FTP
+            Port = 21,
+            Username = @"ad\4607",
+            Password = "gans@123"
+        };
+
+        var dialogOptions = new RemoteDialogOptions
+        {
+            Title = "Select Remote Folder"
+        };
+
+        var dialog = new RemoteFolderDialog(connectionOptions, dialogOptions);
+
+        if (dialog.ShowDialog() == true)
+        {
+            MessageBox.Show($"Selected Folder:\n{dialog.SelectedFolderPath}");
         }
     }
 }

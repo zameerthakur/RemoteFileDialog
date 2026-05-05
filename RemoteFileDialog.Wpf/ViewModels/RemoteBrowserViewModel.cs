@@ -183,7 +183,8 @@ public sealed partial class RemoteBrowserViewModel : ObservableObject, IDisposab
             Items.Add(new RemoteListItemViewModel(item));
         }
 
-        EnsureRootNode();
+        await EnsureRootNodeAsync();
+        await EnsureSelectedPathInTreeAsync(normalizedPath);
     }
 
     /// <summary>
@@ -273,16 +274,106 @@ public sealed partial class RemoteBrowserViewModel : ObservableObject, IDisposab
     }
 
     /// <summary>
-    /// Ensures the root tree node exists.
+    /// Ensures the root tree node exists and loads its child folders.
     /// </summary>
-    private void EnsureRootNode()
+    private async Task EnsureRootNodeAsync()
     {
-        if (TreeNodes.Count > 0)
+        if (TreeNodes.Count == 0)
+        {
+            TreeNodes.Add(new RemoteTreeNodeViewModel("/", "/")
+            {
+                IsExpanded = true,
+                IsSelected = CurrentPath == "/"
+            });
+        }
+
+        var rootNode = TreeNodes[0];
+
+        if (!rootNode.IsLoaded)
+        {
+            await LoadTreeNodeChildrenAsync(rootNode);
+        }
+    }
+
+    /// <summary>
+    /// Loads child folder nodes for the specified tree node.
+    /// </summary>
+    /// <param name="node">The tree node.</param>
+    public async Task LoadTreeNodeChildrenAsync(RemoteTreeNodeViewModel node)
+    {
+        if (node.IsLoaded)
         {
             return;
         }
 
-        TreeNodes.Add(new RemoteTreeNodeViewModel("/", "/"));
+        var result = await _browserService.ListAsync(node.FullPath);
+
+        if (!result.IsSuccess || result.Data == null)
+        {
+            return;
+        }
+
+        node.Children.Clear();
+
+        foreach (var folder in result.Data
+                     .Where(x => x.IsDirectory)
+                     .OrderBy(x => x.Name))
+        {
+            node.Children.Add(new RemoteTreeNodeViewModel(folder.Name, folder.FullPath));
+        }
+
+        node.IsLoaded = true;
+    }
+
+    /// <summary>
+    /// Expands the tree until the selected path is visible.
+    /// </summary>
+    /// <param name="path">The selected remote path.</param>
+    private async Task EnsureSelectedPathInTreeAsync(string path)
+    {
+        var normalizedPath = RemotePathHelper.Normalize(path);
+
+        if (TreeNodes.Count == 0)
+        {
+            return;
+        }
+
+        var currentNode = TreeNodes[0];
+        currentNode.IsExpanded = true;
+
+        if (normalizedPath == "/")
+        {
+            currentNode.IsSelected = true;
+            return;
+        }
+
+        var parts = normalizedPath
+            .Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        var currentPath = "/";
+
+        foreach (var part in parts)
+        {
+            await LoadTreeNodeChildrenAsync(currentNode);
+
+            currentPath = RemotePathHelper.Combine(currentPath, part);
+
+            var nextNode = currentNode.Children
+                .FirstOrDefault(x => RemotePathHelper.Normalize(x.FullPath) == currentPath);
+
+            if (nextNode == null)
+            {
+                return;
+            }
+
+            currentNode.IsExpanded = true;
+            currentNode.IsSelected = false;
+
+            currentNode = nextNode;
+        }
+
+        currentNode.IsExpanded = true;
+        currentNode.IsSelected = true;
     }
 
     /// <summary>
