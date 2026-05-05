@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RemoteFileDialog.Core\RemoteFileDialog.Core.csproj" />
+    <ProjectReference Include="..\RemoteFileDialog.Infrastructure\RemoteFileDialog.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
