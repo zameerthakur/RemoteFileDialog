@@ -37,7 +37,7 @@ public sealed partial class RemoteFileDialogViewModel : ObservableObject
     private bool _allowMultipleSelection = true;
 
     /// <summary>
-    /// Selects or unselects a file item.
+    /// Updates selected files after a file checkbox is changed.
     /// </summary>
     /// <param name="item">The selected remote list item.</param>
     [RelayCommand]
@@ -48,12 +48,13 @@ public sealed partial class RemoteFileDialogViewModel : ObservableObject
             return;
         }
 
-        if (!AllowMultipleSelection)
+        if (!AllowMultipleSelection && item.IsSelected)
         {
-            ClearAllSelections();
+            foreach (var listItem in Browser.Items.Where(x => x != item))
+            {
+                listItem.IsSelected = false;
+            }
         }
-
-        item.IsSelected = !item.IsSelected;
 
         RefreshSelectedFiles();
         ConfirmSelectionCommand.NotifyCanExecuteChanged();

@@ -12,7 +12,8 @@ public sealed class RemoteBrowserService : IRemoteBrowserService
 {
     private readonly RemoteConnectionOptions _options;
     private readonly IRemoteBrowserClientFactory _clientFactory;
-    private IRemoteBrowserClient? _client;
+    private readonly SemaphoreSlim _operationLock = new(1, 1);
+    private IRemoteBrowserClient? _client;    
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RemoteBrowserService"/> class.
@@ -134,6 +135,8 @@ public sealed class RemoteBrowserService : IRemoteBrowserService
     /// <returns>The operation result containing connection state.</returns>
     public async Task<RemoteOperationResult<bool>> IsConnectedAsync(CancellationToken cancellationToken = default)
     {
+        await _operationLock.WaitAsync(cancellationToken);
+
         try
         {
             var isConnected = _client != null
@@ -152,6 +155,10 @@ public sealed class RemoteBrowserService : IRemoteBrowserService
 
             return RemoteOperationResult<bool>.Failure(StatusMessage, ex);
         }
+        finally
+        {
+            _operationLock.Release();
+        }
     }
 
     /// <summary>
@@ -160,10 +167,11 @@ public sealed class RemoteBrowserService : IRemoteBrowserService
     /// <param name="path">The remote path.</param>
     /// <param name="cancellationToken">A token used to cancel the operation.</param>
     /// <returns>The operation result containing remote items.</returns>
-    public async Task<RemoteOperationResult<IReadOnlyList<RemoteItem>>> ListAsync(
-        string path,
-        CancellationToken cancellationToken = default)
+    public async Task<RemoteOperationResult<IReadOnlyList<RemoteItem>>> ListAsync(string path,
+            CancellationToken cancellationToken = default)
     {
+        await _operationLock.WaitAsync(cancellationToken);
+
         try
         {
             if (_client == null)
@@ -184,6 +192,10 @@ public sealed class RemoteBrowserService : IRemoteBrowserService
 
             return RemoteOperationResult<IReadOnlyList<RemoteItem>>.Failure(StatusMessage, ex);
         }
+        finally
+        {
+            _operationLock.Release();
+        }
     }
 
     /// <summary>
@@ -193,6 +205,7 @@ public sealed class RemoteBrowserService : IRemoteBrowserService
     {
         _client?.Dispose();
         _client = null;
+        _operationLock.Dispose();
     }
 
     /// <summary>

@@ -6,9 +6,6 @@ using RemoteFileDialog.Wpf.Options;
 
 namespace RemoteFileDialog.SampleApp;
 
-/// <summary>
-/// Main application window.
-/// </summary>
 public partial class MainWindow : Window
 {
     public MainWindow()
@@ -16,27 +13,45 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
-    private void OpenDialog_Click(object sender, RoutedEventArgs e)
+    private RemoteConnectionOptions GetConnection()
     {
-        var connectionOptions = new RemoteConnectionOptions
+        return new RemoteConnectionOptions
         {
-            ConnectionType = RemoteConnectionType.Ftp, // change to Sftp if needed
-            Host = "192.168.65.239",                  // public test FTP
+            ConnectionType = RemoteConnectionType.Ftp,
+            //Host = "ftp.dlptest.com",
+            //Port = 21,
+            //Username = "dlpuser",
+            //Password = "rNrKYTX9g7z3RgJRmxWuGHbeu"
+            Host = "192.168.65.239", // public test FTP
             Port = 21,
             Username = @"ad\4607",
             Password = "gans@123"
         };
+    }
 
-        var dialogOptions = new RemoteDialogOptions
-        {
-            Title = "Select Remote Folder"
-        };
-
-        var dialog = new RemoteFolderDialog(connectionOptions, dialogOptions);
+    private void OpenFolderDialog_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new RemoteFolderDialog(GetConnection());
 
         if (dialog.ShowDialog() == true)
         {
-            MessageBox.Show($"Selected Folder:\n{dialog.SelectedFolderPath}");
+            MessageBox.Show($"Folder:\n{dialog.SelectedFolderPath}");
+        }
+    }
+
+    private void OpenFileDialog_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new RemoteFilePickerDialog(
+            GetConnection(),
+            new RemoteDialogOptions
+            {
+                AllowMultipleSelection = true
+            });
+
+        if (dialog.ShowDialog() == true)
+        {
+            var files = string.Join("\n", dialog.SelectedFilePaths);
+            MessageBox.Show($"Selected Files:\n{files}");
         }
     }
 }
