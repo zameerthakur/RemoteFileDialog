@@ -47,6 +47,100 @@ Planned target:
 - WPF
 - Windows
 
+## Quick Examples
+
+### FTP Folder Dialog
+
+```csharp
+var connection = new RemoteConnectionOptions
+{
+    ConnectionType = RemoteConnectionType.Ftp,
+    Host = "ftp.example.com",
+    Port = 21,
+    Username = "username",
+    Password = "password"
+};
+
+var dialog = new RemoteFolderDialog(connection);
+
+if (dialog.ShowDialog() == true)
+{
+    var selectedFolder = dialog.SelectedFolderPath;
+}
+```
+
+---
+
+### SFTP Folder Dialog (Password Authentication)
+
+```csharp
+var connection = new RemoteConnectionOptions
+{
+    ConnectionType = RemoteConnectionType.Sftp,
+    Host = "sftp.example.com",
+    Port = 22,
+    Username = "username",
+    Password = "password"
+};
+
+var dialog = new RemoteFolderDialog(connection);
+
+if (dialog.ShowDialog() == true)
+{
+    var selectedFolder = dialog.SelectedFolderPath;
+}
+```
+
+---
+
+### SFTP Folder Dialog (Private Key Authentication)
+
+```csharp
+var connection = new RemoteConnectionOptions
+{
+    ConnectionType = RemoteConnectionType.Sftp,
+    Host = "sftp.example.com",
+    Port = 22,
+    Username = "username",
+    PrivateKeyFilePath = @"C:\Keys\privatekey.ppk",
+    PrivateKeyPassphrase = "optional-passphrase"
+};
+
+var dialog = new RemoteFolderDialog(connection);
+
+if (dialog.ShowDialog() == true)
+{
+    var selectedFolder = dialog.SelectedFolderPath;
+}
+```
+
+---
+
+### Remote File Dialog (Multi-Select)
+
+```csharp
+var connection = new RemoteConnectionOptions
+{
+    ConnectionType = RemoteConnectionType.Sftp,
+    Host = "sftp.example.com",
+    Port = 22,
+    Username = "username",
+    Password = "password"
+};
+
+var dialog = new RemoteFilePickerDialog(
+    connection,
+    new RemoteDialogOptions
+    {
+        AllowMultipleSelection = true
+    });
+
+if (dialog.ShowDialog() == true)
+{
+    var selectedFiles = dialog.SelectedFilePaths;
+}
+```
+
 ## 🚧 Project Status
 
 This project is currently in active development, and the core FTP/SFTP browsing functionality is already implemented and usable.
