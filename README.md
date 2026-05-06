@@ -153,14 +153,15 @@ if (dialog.ShowDialog() == true)
 
 ## 🚧 Project Status
 
-This project is currently in active development, and the core FTP/SFTP browsing functionality is already implemented and usable.
+This project is currently in active development, and the core FTP/SFTP browsing functionality is implemented and usable.
 
 ### ✅ Completed
 
 - FTP browsing support
 - SFTP browsing support
-  - Password authentication
-  - Private key authentication
+- Password authentication
+- Private key authentication
+- Password and private key authentication
 - Remote folder selection dialog
 - Remote file selection dialog
 - Multi-file selection support
@@ -170,24 +171,22 @@ This project is currently in active development, and the core FTP/SFTP browsing 
 - Header checkbox for select all / deselect all files
 - Loading indicators and UI status feedback
 - Professional vector-based icons
+- Standardized date formatting
+- Human-readable file size formatting
+- Documentation and usage examples
 - Sample WPF application for testing
-
-### ⏳ In Progress
-
-- Additional UI/UX polish
-- TreeView lazy loading improvements
-- Better file size/date formatting
-- Keyboard navigation improvements
 
 ### 🔜 Planned
 
 - NuGet package release
-- Full documentation and usage examples
 - Advanced filtering and sorting
 - Dark mode support
 - Search support
 - File type filtering
 - Localization support
+- Keyboard navigation improvements
+- Additional UI/UX polish
+- TreeView lazy loading improvements
 
 ## License
 
