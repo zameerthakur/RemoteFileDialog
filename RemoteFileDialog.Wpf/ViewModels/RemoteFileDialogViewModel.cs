@@ -37,6 +37,27 @@ public sealed partial class RemoteFileDialogViewModel : ObservableObject
     private bool _allowMultipleSelection = true;
 
     /// <summary>
+    /// Gets or sets a value indicating whether all visible files are selected.
+    /// </summary>
+    [ObservableProperty]
+    private bool _areAllFilesSelected;
+
+    /// <summary>
+    /// Selects or deselects all visible file items.
+    /// </summary>
+    [RelayCommand]
+    private void ToggleSelectAllFiles()
+    {
+        foreach (var item in Browser.Items.Where(x => x.IsFile))
+        {
+            item.IsSelected = AreAllFilesSelected;
+        }
+
+        RefreshSelectedFiles();
+        ConfirmSelectionCommand.NotifyCanExecuteChanged();
+    }
+
+    /// <summary>
     /// Updates selected files after a file checkbox is changed.
     /// </summary>
     /// <param name="item">The selected remote list item.</param>
@@ -57,6 +78,14 @@ public sealed partial class RemoteFileDialogViewModel : ObservableObject
         }
 
         RefreshSelectedFiles();
+
+        AreAllFilesSelected = Browser.Items
+            .Where(x => x.IsFile)
+            .Any() &&
+            Browser.Items
+                .Where(x => x.IsFile)
+                .All(x => x.IsSelected);
+
         ConfirmSelectionCommand.NotifyCanExecuteChanged();
     }
 

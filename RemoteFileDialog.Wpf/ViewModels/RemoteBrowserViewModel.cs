@@ -19,6 +19,12 @@ public sealed partial class RemoteBrowserViewModel : ObservableObject, IDisposab
     private readonly RemoteConnectionOptions _connectionOptions;
 
     /// <summary>
+    /// Gets or sets a value indicating whether a remote operation is running.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isBusy;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="RemoteBrowserViewModel"/> class.
     /// </summary>
     /// <param name="connectionOptions">The remote connection options.</param>
@@ -108,19 +114,27 @@ public sealed partial class RemoteBrowserViewModel : ObservableObject, IDisposab
     [RelayCommand]
     public async Task InitializeAsync()
     {
-        var connectResult = await _browserService.ConnectAsync();
-
-        Status = _browserService.Status;
-        StatusMessage = connectResult.Message;
-
-        if (!connectResult.IsSuccess)
+        IsBusy = true;
+        try
         {
-            ClearBrowser();
-            return;
-        }
+            var connectResult = await _browserService.ConnectAsync();
 
-        await LoadPathAsync(CurrentPath);
-        await _connectionMonitor.StartAsync();
+            Status = _browserService.Status;
+            StatusMessage = connectResult.Message;
+
+            if (!connectResult.IsSuccess)
+            {
+                ClearBrowser();
+                return;
+            }
+
+            await LoadPathAsync(CurrentPath);
+            await _connectionMonitor.StartAsync();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     /// <summary>
@@ -138,21 +152,29 @@ public sealed partial class RemoteBrowserViewModel : ObservableObject, IDisposab
     [RelayCommand(CanExecute = nameof(CanReconnect))]
     public async Task ReconnectAsync()
     {
-        var reconnectResult = await _browserService.ReconnectAsync();
-
-        Status = _browserService.Status;
-        StatusMessage = reconnectResult.Message;
-
-        if (!reconnectResult.IsSuccess)
+        IsBusy = true;
+        try
         {
-            ClearBrowser();
-            return;
+            var reconnectResult = await _browserService.ReconnectAsync();
+
+            Status = _browserService.Status;
+            StatusMessage = reconnectResult.Message;
+
+            if (!reconnectResult.IsSuccess)
+            {
+                ClearBrowser();
+                return;
+            }
+
+            var restorePath = GetRestorePath();
+
+            await LoadPathAsync(restorePath);
+            await _connectionMonitor.StartAsync();
         }
-
-        var restorePath = GetRestorePath();
-
-        await LoadPathAsync(restorePath);
-        await _connectionMonitor.StartAsync();
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     /// <summary>
@@ -161,30 +183,38 @@ public sealed partial class RemoteBrowserViewModel : ObservableObject, IDisposab
     /// <param name="path">The remote path to load.</param>
     public async Task LoadPathAsync(string path)
     {
-        var normalizedPath = RemotePathHelper.Normalize(path);
-        var result = await _browserService.ListAsync(normalizedPath);
-
-        Status = _browserService.Status;
-        StatusMessage = result.Message;
-
-        if (!result.IsSuccess || result.Data == null)
+        IsBusy = true;
+        try
         {
-            ClearBrowser();
-            return;
+            var normalizedPath = RemotePathHelper.Normalize(path);
+            var result = await _browserService.ListAsync(normalizedPath);
+
+            Status = _browserService.Status;
+            StatusMessage = result.Message;
+
+            if (!result.IsSuccess || result.Data == null)
+            {
+                ClearBrowser();
+                return;
+            }
+
+            CurrentPath = normalizedPath;
+            LastBrowsedPath = normalizedPath;
+
+            Items.Clear();
+
+            foreach (var item in result.Data.OrderByDescending(x => x.IsDirectory).ThenBy(x => x.Name))
+            {
+                Items.Add(new RemoteListItemViewModel(item));
+            }
+
+            await EnsureRootNodeAsync();
+            await EnsureSelectedPathInTreeAsync(normalizedPath);
         }
-
-        CurrentPath = normalizedPath;
-        LastBrowsedPath = normalizedPath;
-
-        Items.Clear();
-
-        foreach (var item in result.Data.OrderByDescending(x => x.IsDirectory).ThenBy(x => x.Name))
+        finally
         {
-            Items.Add(new RemoteListItemViewModel(item));
+            IsBusy = false;
         }
-
-        await EnsureRootNodeAsync();
-        await EnsureSelectedPathInTreeAsync(normalizedPath);
     }
 
     /// <summary>
