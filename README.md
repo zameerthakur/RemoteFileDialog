@@ -141,6 +141,16 @@ if (dialog.ShowDialog() == true)
 }
 ```
 
+## Screenshots
+
+### Remote Folder Dialog
+
+![Remote Folder Dialog](assets/screenshots/folder-dialog.png)
+
+### Remote File Dialog
+
+![Remote File Dialog](assets/screenshots/file-dialog.png)
+
 ## 🚧 Project Status
 
 This project is currently in active development, and the core FTP/SFTP browsing functionality is already implemented and usable.
