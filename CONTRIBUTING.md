@@ -4,9 +4,9 @@ Contributions are welcome.
 
 ## Development Requirements
 
-- Visual Studio 2022
 - .NET 8 SDK
 - Windows with WPF support
+- Visual Studio 2022 or another .NET-compatible IDE
 
 ---
 
