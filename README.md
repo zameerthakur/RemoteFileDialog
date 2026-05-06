@@ -198,3 +198,4 @@ This project uses the following open-source libraries:
 
 - FluentFTP (MIT License)
 - SSH.NET (MIT License)
+- CommunityToolkit.Mvvm (MIT License)
