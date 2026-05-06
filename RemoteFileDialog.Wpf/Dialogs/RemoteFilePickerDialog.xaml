@@ -280,11 +280,11 @@
 
                                 <GridViewColumn Header="Size"
                                         Width="100"
-                                        DisplayMemberBinding="{Binding Size}"/>
+                                        DisplayMemberBinding="{Binding SizeText}"/>
 
                                 <GridViewColumn Header="Modified"
                                         Width="170"
-                                        DisplayMemberBinding="{Binding ModifiedDate}"/>
+                                        DisplayMemberBinding="{Binding ModifiedDateText}"/>
                             </GridView>
                         </ListView.View>
 

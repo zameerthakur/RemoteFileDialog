@@ -59,6 +59,48 @@ public sealed partial class RemoteListItemViewModel : ObservableObject
     public DateTime? ModifiedDate => RemoteItem.ModifiedDate;
 
     /// <summary>
+    /// Gets the formatted modified date.
+    /// </summary>
+    public string ModifiedDateText => ModifiedDate.HasValue
+        ? ModifiedDate.Value.ToString("yyyy-MM-dd HH:mm")
+        : string.Empty;
+
+    /// <summary>
+    /// Gets the formatted file size.
+    /// </summary>
+    public string SizeText
+    {
+        get
+        {
+            if (Size <= 0)
+            {
+                return string.Empty;
+            }
+
+            const double kb = 1024;
+            const double mb = kb * 1024;
+            const double gb = mb * 1024;
+
+            if (Size >= gb)
+            {
+                return $"{Size / gb:0.00} GB";
+            }
+
+            if (Size >= mb)
+            {
+                return $"{Size / mb:0.00} MB";
+            }
+
+            if (Size >= kb)
+            {
+                return $"{Size / kb:0.00} KB";
+            }
+
+            return $"{Size} B";
+        }
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the item is selected.
     /// </summary>
     [ObservableProperty]
