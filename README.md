@@ -2,6 +2,12 @@
 
 Reusable WPF dialog for browsing and selecting files and folders from FTP and SFTP servers.
 
+## NuGet Packages
+
+- [RemoteFileDialog.Wpf](https://www.nuget.org/packages/RemoteFileDialog.Wpf)
+- [RemoteFileDialog.Core](https://www.nuget.org/packages/RemoteFileDialog.Core)
+- [RemoteFileDialog.Infrastructure](https://www.nuget.org/packages/RemoteFileDialog.Infrastructure)
+
 ## Overview
 
 RemoteFileDialog is a .NET WPF component that provides reusable dialog windows for remote file and folder selection.
